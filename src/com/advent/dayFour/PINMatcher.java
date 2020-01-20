@@ -8,15 +8,23 @@ public class PINMatcher {
     private int endNumber;
     private int currentNumber;
 
+    public PINMatcher() {
+
+    }
+
     public PINMatcher(int startNumber, int endNumber) {
         this.startNumber = startNumber;
         this.endNumber = endNumber;
 
-        currentNumber = this.startNumber;
+        currentNumber = startNumber;
     }
 
     public int getLastMatchingNumber() {
         return lastMatchingNumber;
+    }
+
+    public void reset() {
+        currentNumber = startNumber;
     }
 
     public int getNextMatchingPIN() {
@@ -25,7 +33,7 @@ public class PINMatcher {
                 currentNumber = getNextNonDecreasingNumber(currentNumber);
             }
 
-            if (hasDoubleDigits(currentNumber)) {
+            if (hasDoubleDigitsMeetingRule(currentNumber)) {
                 lastMatchingNumber = currentNumber;
                 currentNumber++;
                 return lastMatchingNumber;
@@ -37,7 +45,7 @@ public class PINMatcher {
         return -1;
     }
 
-    private boolean hasDoubleDigits(int number) {
+    protected boolean hasDoubleDigitsMeetingRule(int number) {
         String numberAsString = String.valueOf(number);
         for (int i = 1; i < numberAsString.length(); i++) {
             if (numberAsString.charAt(i) == numberAsString.charAt(i - 1)) {
@@ -80,5 +88,22 @@ public class PINMatcher {
 
     private boolean isNumberInRange(int number) {
         return startNumber <= number && number <= endNumber;
+    }
+
+    public int getStartNumber() {
+        return startNumber;
+    }
+
+    public void setStartNumber(int startNumber) {
+        this.startNumber = startNumber;
+        currentNumber = startNumber;
+    }
+
+    public int getEndNumber() {
+        return endNumber;
+    }
+
+    public void setEndNumber(int endNumber) {
+        this.endNumber = endNumber;
     }
 }
