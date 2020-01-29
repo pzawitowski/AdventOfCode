@@ -5,7 +5,13 @@ public class OpcodeInstruction {
         ADD,
         MULTIPLY,
         INPUT,
-        OUTPUT
+        OUTPUT,
+        JUMP_IF_TRUE,
+        JUMP_IF_FALSE,
+        LESS_THAN,
+        EQUALS
+
+
     }
 
     public enum ParameterMode {
@@ -46,6 +52,14 @@ public class OpcodeInstruction {
                 return Instruction.INPUT;
             case 4:
                 return Instruction.OUTPUT;
+            case 5:
+                return Instruction.JUMP_IF_TRUE;
+            case 6:
+                return Instruction.JUMP_IF_FALSE;
+            case 7:
+                return Instruction.LESS_THAN;
+            case 8:
+                return Instruction.EQUALS;
             default:
                 throw  new RuntimeException("Not supported instruction encountered");
         }

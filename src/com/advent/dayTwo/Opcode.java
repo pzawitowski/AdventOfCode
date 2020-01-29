@@ -1,6 +1,5 @@
 package com.advent.dayTwo;
 
-import com.advent.dayTwo.OpcodeInstruction.Instruction;
 import com.advent.dayTwo.OpcodeInstruction.ParameterMode;
 
 import java.util.Arrays;
@@ -17,6 +16,8 @@ public class Opcode {
     private int input;
     private int output;
 
+    private int instructionPosition = 0;
+
     public Opcode(int[] opcodes) {
         this.opcodes = opcodes;
     }
@@ -27,43 +28,84 @@ public class Opcode {
     }
 
     public void processOpcodes() {
-        int startPosition = 0;
+        instructionPosition = 0;
 
-        while (opcodes[startPosition] != OPERATION_END) {
-            startPosition += processOpcode(startPosition);
+        while (opcodes[instructionPosition] != OPERATION_END) {
+            processOpcode();
         }
     }
 
-    private int processOpcode(int startPosition) {
+    private void processOpcode() {
         int firstArgument;
         int secondArgument;
         int resultPosition;
-        int positionMovement = 4;
-        OpcodeInstruction opcodeInstruction = new OpcodeInstruction(opcodes[startPosition]);
+        int firstArgumentPosition = instructionPosition + 1;
+        int secondArgumentPosition = instructionPosition + 2;
+
+        OpcodeInstruction opcodeInstruction = new OpcodeInstruction(opcodes[instructionPosition]);
 
         if (opcodeInstruction.getInstruction() == INPUT || opcodeInstruction.getInstruction() == OUTPUT) {
-            resultPosition =opcodes[startPosition + 1];
+            resultPosition =opcodes[instructionPosition + 1];
         } else {
-            resultPosition =opcodes[startPosition + 3];
+            resultPosition =opcodes[instructionPosition + 3];
         }
 
-        firstArgument =  getParameterValue(startPosition + 1, opcodeInstruction.getParameterModes()[2]);
+        firstArgument =  getParameterValue(firstArgumentPosition, opcodeInstruction.getParameterModes()[2]);
 
-        if (opcodeInstruction.getInstruction() == INPUT) {
-            opcodes[opcodes[startPosition + 1]] = input;
-            positionMovement = 2;
-        } else if (opcodeInstruction.getInstruction() == OUTPUT) {
-            output = opcodes[opcodes[startPosition + 1]];
-            positionMovement = 2;
-        } else if (opcodeInstruction.getInstruction() == Instruction.ADD) {
-            secondArgument = getParameterValue(startPosition + 2, opcodeInstruction.getParameterModes()[1]);
-            opcodes[resultPosition] = firstArgument + secondArgument;
-        } else if (opcodeInstruction.getInstruction()  == Instruction.MULTIPLY){
-            secondArgument = getParameterValue(startPosition + 2, opcodeInstruction.getParameterModes()[1]);
-            opcodes[resultPosition] = firstArgument * secondArgument;
+        switch (opcodeInstruction.getInstruction()) {
+            case INPUT:
+                opcodes[opcodes[firstArgumentPosition]] = input;
+                instructionPosition += 2;
+                break;
+            case OUTPUT:
+                output = opcodes[opcodes[firstArgumentPosition]];
+                instructionPosition += 2;
+                break;
+            case ADD:
+                secondArgument = getParameterValue(secondArgumentPosition, opcodeInstruction.getParameterModes()[1]);
+                opcodes[resultPosition] = firstArgument + secondArgument;
+                instructionPosition += 4;
+                break;
+            case MULTIPLY:
+                secondArgument = getParameterValue(secondArgumentPosition, opcodeInstruction.getParameterModes()[1]);
+                opcodes[resultPosition] = firstArgument * secondArgument;
+                instructionPosition += 4;
+                break;
+            case JUMP_IF_TRUE:
+                secondArgument = getParameterValue(secondArgumentPosition, opcodeInstruction.getParameterModes()[1]);
+                if (firstArgument != 0) {
+                    instructionPosition = secondArgument;
+                } else {
+                    instructionPosition += 3;
+                }
+                break;
+            case JUMP_IF_FALSE:
+                secondArgument = getParameterValue(secondArgumentPosition, opcodeInstruction.getParameterModes()[1]);
+                if (firstArgument == 0) {
+                    instructionPosition = secondArgument;
+                } else {
+                    instructionPosition += 3;
+                }
+                break;
+            case LESS_THAN:
+                secondArgument = getParameterValue(secondArgumentPosition, opcodeInstruction.getParameterModes()[1]);
+                if (firstArgument < secondArgument) {
+                    opcodes[resultPosition] = 1;
+                } else {
+                    opcodes[resultPosition] = 0;
+                }
+                instructionPosition += 4;
+                break;
+            case EQUALS:
+                secondArgument = getParameterValue(secondArgumentPosition, opcodeInstruction.getParameterModes()[1]);
+                if (firstArgument == secondArgument) {
+                    opcodes[resultPosition] = 1;
+                } else {
+                    opcodes[resultPosition] = 0;
+                }
+                instructionPosition += 4;
+                break;
         }
-
-        return positionMovement;
     }
 
     private int getParameterValue(int paramPosition, ParameterMode parameterMode) {
@@ -93,5 +135,10 @@ public class Opcode {
 
     public int getOutput() {
         return output;
+    }
+
+    public int getInstructionPosition() {
+
+        return instructionPosition;
     }
 }
