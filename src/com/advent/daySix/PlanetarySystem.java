@@ -70,4 +70,12 @@ public class PlanetarySystem {
 
         return numberOfOrbits;
     }
+
+    public Planet getPlanetOrbitedBy(String orbitingPlanetName) {
+        Planet orbitingPlanet = allPlanets.get(orbitingPlanetName);
+        if (orbitingPlanet == null) {
+            throw new IllegalArgumentException("Planet '" + orbitingPlanetName + "' not found");
+        }
+        return orbitingPlanet.getOrbitedPlanet();
+    }
 }
