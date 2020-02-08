@@ -8,13 +8,14 @@ import static com.advent.dayTwo.OpcodeInstruction.Instruction.INPUT;
 import static com.advent.dayTwo.OpcodeInstruction.Instruction.OUTPUT;
 
 public class Opcode {
-    public static final int ADD = 1;
-    public static final int MULTIPLY = 2;
     public static final int OPERATION_END = 99;
 
     private int opcodes[];
-    private int input;
+    private int inputs[] = new int[] {0, 0, 0, 0, 0};
     private int output;
+
+    private int inputNumber = 0;
+    private boolean stopAtOutput = false;
 
     private int instructionPosition = 0;
 
@@ -24,7 +25,7 @@ public class Opcode {
 
     public Opcode(int[] opcodes, int input) {
         this(opcodes);
-        this.input = input;
+        this.inputs = new int[] {input};
     }
 
     public void processOpcodes() {
@@ -44,18 +45,15 @@ public class Opcode {
 
         OpcodeInstruction opcodeInstruction = new OpcodeInstruction(opcodes[instructionPosition]);
 
-        if (opcodeInstruction.getInstruction() == INPUT || opcodeInstruction.getInstruction() == OUTPUT) {
-            resultPosition =opcodes[instructionPosition + 1];
-        } else {
-            resultPosition =opcodes[instructionPosition + 3];
-        }
+        resultPosition = getResultPosition(opcodeInstruction);
 
         firstArgument =  getParameterValue(firstArgumentPosition, opcodeInstruction.getParameterModes()[2]);
 
         switch (opcodeInstruction.getInstruction()) {
             case INPUT:
-                opcodes[opcodes[firstArgumentPosition]] = input;
+                opcodes[opcodes[firstArgumentPosition]] = inputs[inputNumber];
                 instructionPosition += 2;
+                inputNumber++;
                 break;
             case OUTPUT:
                 output = opcodes[opcodes[firstArgumentPosition]];
@@ -108,6 +106,16 @@ public class Opcode {
         }
     }
 
+    private int getResultPosition(OpcodeInstruction opcodeInstruction) {
+        int resultPosition;
+        if (opcodeInstruction.getInstruction() == INPUT || opcodeInstruction.getInstruction() == OUTPUT) {
+            resultPosition =opcodes[instructionPosition + 1];
+        } else {
+            resultPosition =opcodes[instructionPosition + 3];
+        }
+        return resultPosition;
+    }
+
     private int getParameterValue(int paramPosition, ParameterMode parameterMode) {
         if (parameterMode == ParameterMode.POSITION) {
             return opcodes[opcodes[paramPosition]];
@@ -129,8 +137,15 @@ public class Opcode {
     }
 
     public void setInput(int input) {
+        if (inputs == null) {
+            inputs = new int[] {input};
+        } else {
+            inputs[0] = input;
+        }
+    }
 
-        this.input = input;
+    public void setInputs(int inputs[]) {
+        this.inputs = inputs;
     }
 
     public int getOutput() {
@@ -140,5 +155,13 @@ public class Opcode {
     public int getInstructionPosition() {
 
         return instructionPosition;
+    }
+
+    public boolean isStopAtOutput() {
+        return stopAtOutput;
+    }
+
+    public void setStopAtOutput(boolean stopAtOutput) {
+        this.stopAtOutput = stopAtOutput;
     }
 }

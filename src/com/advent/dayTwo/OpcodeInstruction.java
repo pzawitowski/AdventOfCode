@@ -9,9 +9,8 @@ public class OpcodeInstruction {
         JUMP_IF_TRUE,
         JUMP_IF_FALSE,
         LESS_THAN,
-        EQUALS
-
-
+        EQUALS,
+        OPERATION_END
     }
 
     public enum ParameterMode {
@@ -60,6 +59,8 @@ public class OpcodeInstruction {
                 return Instruction.LESS_THAN;
             case 8:
                 return Instruction.EQUALS;
+            case 99:
+                return Instruction.OPERATION_END;
             default:
                 throw  new RuntimeException("Not supported instruction encountered");
         }
